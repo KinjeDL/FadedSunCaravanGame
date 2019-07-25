@@ -103,30 +103,30 @@ p.footer
             <button onclick="newCaravan()" class="btn green">Run a caravan</button>
             <form>
                     <select id="cargo">
-                    <option value="Raw Goods">Raw Goods</option>
-                    <option value="Staples">Staples</option>
-                    <option value="Luxury Goods">Luxury Goods</option>
+                    <option value="Raw Goods">Raw Goods (Profit * 1, cost 4 gp)</option>
+                    <option value="Staples">Staples (Profit * 1.5, cost 40 gp)</option>
+                    <option value="Luxury Goods">Luxury Goods (Profit * 2, cost 400 gp)</option>
                 </select>
                 <select id="ryder">
-                    <option value="noryder">No Ryder</option>
-                    <option value="ryder">Ryder is accompanying</option>
+                    <option value="noryder">No Ryder (+0)</option>
+                    <option value="ryder">Ryder is accompanying (+10)</option>
                 </select>
                 <select id="pcs">
-                    <option value=0>0 other PCs</option>
-                    <option value=1>1 other PC</option>
-                    <option value=2>2 other PCs</option>
-                    <option value=3>3 other PCs</option>
+                    <option value=0>0 other PCs (+0)</option>
+                    <option value=1>1 other PC (+5)</option>
+                    <option value=2>2 other PCs (+10)</option>
+                    <option value=3>3 other PCs (+15)</option>
                 </select>
                 <select id="guards">
-                    <option value=0>0 guards</option>
-                    <option value=1>1 guard</option>
-                    <option value=2>2 guards</option>
+                    <option value=0>0 guards (+0)</option>
+                    <option value=1>1 guard (+5)</option>
+                    <option value=2>2 guards (+10)</option>
                 </select>
                 <select id="horses">
-                    <option value="nohorses">No extra horses</option>
-                    <option value="horses">Send extra horse(s)</option>
+                    <option value="nohorses">No extra horses (+0)</option>
+                    <option value="horses">Send extra horse(s) (+5)</option>
                 </select>
-                Duration:<input type="number" id="duration" value=30 min=1 max=90>
+                Duration:<input type="number" id="duration" value=30 min=1 max=90>days
             </form> 
         </div>
         <div class="div big" id="header-output"></div>
@@ -294,7 +294,7 @@ p.footer
             modifierstring += caravan.pcs + " non-Ryder PCs (+" + 5*caravan.pcs + "), + " + caravan.guards + " guards (+" + 5*caravan.guards + "), + ";
             if(caravan.horses) modifierstring += " extra horse (+5) + ";
             modifierstring += caravan.duration + " days duration, for a total modifier of +" + caravan.totalmodifier;
-            document.getElementById("modifier-output").innerHTML = modifierstring;
+            // document.getElementById("modifier-output").innerHTML = modifierstring;
             if(caravan.totalprofit >= 0) document.getElementById("profit-output").innerHTML = "That results in " + convertToCoin(caravan.totalprofit).bold() + " total profit";
             else {
                 caravan.totalprofit = -caravan.totalprofit;
