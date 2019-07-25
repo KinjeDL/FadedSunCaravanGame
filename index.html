@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<style>
+div.background
+{
+    opacity: .20;
+    background-image: url("./faded-sun-map.png");
+    width:100%;
+    height:100%;
+    min-height: 640px;
+    min-width: 480px;
+}
+div.foreground
+{
+    position: absolute;
+    top: 10px;
+    opacity: 1.0;
+}
+.btn {
+  border: none;
+  background-color: inherit;
+  padding: 14px 28px;
+  font-size: 16px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+/* Green */
+.green {
+  color: green;
+  background: rgb(170, 247, 163);
+}
+
+.green:hover {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* Red */
+.red {
+  color: red;
+  background: rgb(247, 152, 152);
+}
+
+.red:hover {
+  background: #f44336;
+  color: white;
+}
+
+/* Gray */
+.recall {
+  color: black;
+  background: grey
+}
+
+.recall:hover {
+  background: #e7e7e7;
+}
+
+.hidden
+{
+    color: black;
+    visibility:hidden;
+}
+
+div.big
+{
+    font-size: 220%;
+    font-weight: bold;
+}
+div.med
+{
+    font-size: 160%;
+}
+div.smol
+{
+    font-size: 100%;
+}
+div.input
+{
+    border: 1px solid black;
+    font-size: 100%;
+}
+img{
+    border: 1px solid black;
+    width: 100%;
+    height: auto;
+}
+p.footer
+{
+    position: relative;
+    bottom: 10%;
+}
+</style>
+<body>
+    <div class="div background"></div>
+    <div class="div foreground">
+        <div>
+            <button onclick="reset()" class="btn red">Clear all settings</button>
+            <button onclick="newCaravan()" class="btn green">Run a caravan</button>
+            <form>
+                    <select id="cargo">
+                    <option value="Raw Goods">Raw Goods</option>
+                    <option value="Staples">Staples</option>
+                    <option value="Luxury Goods">Luxury Goods</option>
+                </select>
+                <select id="ryder">
+                    <option value="noryder">No Ryder</option>
+                    <option value="ryder">Ryder is accompanying</option>
+                </select>
+                <select id="pcs">
+                    <option value=0>0 other PCs</option>
+                    <option value=1>1 other PC</option>
+                    <option value=2>2 other PCs</option>
+                    <option value=3>3 other PCs</option>
+                </select>
+                <select id="guards">
+                    <option value=0>0 guards</option>
+                    <option value=1>1 guard</option>
+                    <option value=2>2 guards</option>
+                </select>
+                <select id="horses">
+                    <option value="nohorses">No extra horses</option>
+                    <option value="horses">Send extra horse(s)</option>
+                </select>
+                Duration:<input type="number" id="duration" value=30 min=1 max=90>
+            </form> 
+        </div>
+        <div class="div big" id="header-output"></div>
+        <div class="div med" id="dice-roll-output"></div>
+        <div class="div med" id="modifier-output"></div>
+        <div class="div med" id="profit-output"></div>
+        <div class="div smol" id="profit-breakdown"></div>
+        <div>
+            <button onclick="showCaravan(caravans[0])" style="font-size:130%;" class="btn hidden" id="caravan-button-1">Caravan 1</button>
+            <button onclick="showCaravan(caravans[1])" style="font-size:130%;" class="btn hidden" id="caravan-button-2">Caravan 2</button>
+            <button onclick="showCaravan(caravans[2])" style="font-size:130%;" class="btn hidden" id="caravan-button-3">Caravan 3</button>
+            <button onclick="showCaravan(caravans[3])" style="font-size:130%;" class="btn hidden" id="caravan-button-4">Caravan 4</button>
+            <button onclick="showCaravan(caravans[4])" style="font-size:130%;" class="btn hidden" id="caravan-button-5">Caravan 5</button>
+            <button onclick="showCaravan(caravans[5])" style="font-size:130%;" class="btn hidden" id="caravan-button-6">Caravan 6</button>
+        </div>
+        <p class ="p footer" id="footer-credits" style="font-size:120%;">A caravan script for The Faded Sun.</p>
+    </div>  
+</body>
+
+<script>
+    const cargotypes = ["Raw Goods","Staples","Luxury Goods"]
+    const profitresults = [
+        {
+            minroll:1,
+            maxroll:20,
+            multiplier:1,
+            profitreturn: function() {
+                return (Math.floor(Math.random()*12) + 1) * this.multiplier;
+            }
+        },{
+            minroll:21,
+            maxroll:30,
+            multiplier:10,
+            profitreturn: function() {
+                return (Math.floor(Math.random()*12) + Math.floor(Math.random()*12) + 2) * this.multiplier;
+            }
+        },{
+            minroll:31,
+            maxroll:40,
+            multiplier:30,
+            profitreturn: function() {
+                return (Math.floor(Math.random()*12) + 1) * this.multiplier;
+            }
+        },{
+            minroll:41,
+            maxroll:60,
+            multiplier:40,
+            profitreturn: function() {
+                return (Math.floor(Math.random()*12) + 1) * this.multiplier;
+            }
+        },{
+            minroll:61,
+            maxroll:80,
+            multiplier:60,
+            profitreturn: function() {
+                return (Math.floor(Math.random()*12) + 1) * this.multiplier;
+            }
+        },{
+            minroll:81,
+            maxroll:90,
+            multiplier:80,
+            profitreturn: function() {
+                return (Math.floor(Math.random()*12) + 1) * this.multiplier;
+            }
+        },{
+            minroll:91,
+            maxroll:9999,
+            multiplier:90,
+            profitreturn: function() {
+                return (Math.floor(Math.random()*12) + 1) * this.multiplier;
+            }
+        },
+    ]
+
+    var caravans = [];
+
+    function buildCaravan() {
+        let caravanobj = {
+            roll: Math.floor(Math.random()*100) + 1,
+            name: "Caravan " + (caravans.length + 1),
+            goods: document.getElementById("cargo").value,
+            ryder: false,
+            pcs: document.getElementById("pcs").value,
+            guards: document.getElementById("guards").value,
+            horses: false,
+            duration: parseInt(document.getElementById("duration").value),
+            totalmodifier: 0,
+            totalresult: 0,
+            totalprofit: 0,
+            cost: 0,
+            goodscost: 40,
+            findProfit: function() {
+                let profit = 0;
+                for(let i = 0;i<profitresults.length;i++) if(this.totalresult >= profitresults[i].minroll && this.totalresult <= profitresults[i].maxroll) profit = profitresults[i].profitreturn();
+                if(this.goods === "Staples") profit = profit * 1.5;
+                if(this.goods === "Luxury Goods") profit = profit * 2;
+                return profit;
+            }
+        };
+
+        if(document.getElementById("ryder").value === "ryder") caravanobj.ryder=true;
+        if(document.getElementById("horses").value === "horses") caravanobj.horses=true;
+        if(caravanobj.duration < 1) caravanobj.duration = 1; 
+        if(caravanobj.duration > 90) caravanobj.duration = 90;
+        caravanobj.totalmodifier += caravanobj.duration;
+        caravanobj.totalmodifier += 5 * caravanobj.pcs;
+        caravanobj.totalmodifier += 5 * caravanobj.guards;
+        if(caravanobj.ryder) caravanobj.totalmodifier += 10;
+        if(caravanobj.horses) caravanobj.totalmodifier += 5;
+
+        caravanobj.cost = Math.floor(caravanobj.duration/2);
+        if(caravanobj.goods === "Staples") caravanobj.goodscost = 400;
+        if(caravanobj.goods === "Luxury Goods") caravanobj.goodscost = 4000;
+
+        caravanobj.totalresult = caravanobj.totalmodifier + caravanobj.roll;
+        caravanobj.totalprofit = (caravanobj.findProfit() - caravanobj.cost) - caravanobj.goodscost;
+
+        return caravanobj;
+    }
+
+    function convertToCoin(num) {
+        let rs = "";
+        if(num === 0) rs += "0";
+        if(num >= 100) {
+            let pp = Math.floor(num/100);
+            num -= pp*100;
+            rs += pp + " Platinum Pieces";
+        }
+        if(num >= 10) {
+            let gp = Math.floor(num/10);
+            num -= gp*10;
+            if(rs !== "") rs += ", ";
+            rs += gp + " Gold Pieces";
+        }
+        if(num >= 1) {
+            if(rs !== "") rs += " and ";
+            rs += num + " Silver Pieces";
+        }
+        return rs;
+    }
+
+
+    function newCaravan() {
+        let caravan = buildCaravan();
+        if(caravans.length === 6) {
+            document.getElementById("header-output").innerHTML = "Max Caravans Assigned!";
+            document.getElementById("dice-roll-output").innerHTML = "Review the team with the buttons below, or " + "Clear all Settings".fontcolor("red") + " to start over.";
+            document.getElementById("modifier-output").innerHTML = "";
+            document.getElementById("profit-output").innerHTML = "";
+            return; 
+        }
+        caravans.push(caravan);
+        showCaravan(caravan);
+        document.getElementById("caravan-button-"+caravans.length.toString()).innerHTML=caravan.name.bold();
+        document.getElementById("caravan-button-"+caravans.length.toString()).className="btn recall";
+    }
+
+    function showCaravan(caravan) {
+        if(typeof caravan !== null) {
+            document.getElementById("header-output").innerHTML = "Caravan Dispatched, carrying " + caravan.goods + " which cost " + caravan.goodscost/10 +" gold pieces.";
+            document.getElementById("dice-roll-output").innerHTML = "You rolled " + caravan.roll.toString().bold() + " for a total of " + caravan.totalresult.toString().bold();
+            let modifierstring = "";
+            if(caravan.ryder) modifierstring +="With the following modifiers: Ryder (+10) + ";
+            else modifierstring += "With the following modifiers: ";
+            modifierstring += caravan.pcs + " non-Ryder PCs (+" + 5*caravan.pcs + "), + " + caravan.guards + " guards (+" + 5*caravan.guards + "), + ";
+            if(caravan.horses) modifierstring += " extra horse (+5) + ";
+            modifierstring += caravan.duration + " days duration, for a total modifier of +" + caravan.totalmodifier;
+            document.getElementById("modifier-output").innerHTML = modifierstring;
+            if(caravan.totalprofit >= 0) document.getElementById("profit-output").innerHTML = "That results in " + convertToCoin(caravan.totalprofit).bold() + " total profit";
+            else {
+                caravan.totalprofit = -caravan.totalprofit;
+                document.getElementById("profit-output").innerHTML = "That results in " + convertToCoin(caravan.totalprofit).bold().fontcolor("red") + " loss!".bold();
+            }
+            document.getElementById("profit-breakdown").innerHTML = "(" + convertToCoin(caravan.findProfit()) + " net, minus " + convertToCoin(caravan.cost) + " wages and " + convertToCoin(caravan.goodscost) + " goods)";
+            
+        }
+    }
+
+    function reset() {
+        document.getElementById("header-output").innerHTML = "Press 'Run a caravan' to begin";
+        document.getElementById("dice-roll-output").innerHTML = "";
+        document.getElementById("modifier-output").innerHTML = "";
+        document.getElementById("profit-output").innerHTML = "";
+        for(let i = 1;i<=6;i++) document.getElementById("caravan-button-"+i).className="btn hidden";
+        caravans = [];
+    }
+    </script>
+</html>
