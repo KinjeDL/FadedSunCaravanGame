@@ -118,9 +118,9 @@ p.footer
                     <option value=3>3 other PCs (+15)</option>
                 </select>
                 <select id="guards">
-                    <option value=0>0 guards (+0)</option>
-                    <option value=1>1 guard (+5)</option>
-                    <option value=2>2 guards (+10)</option>
+                    <option value=0>0 extra guards (+0)</option>
+                    <option value=1>1 extra guard (+5)</option>
+                    <option value=2>2 extra guards (+10)</option>
                 </select>
                 <select id="horses">
                     <option value="nohorses">No extra horses (+0)</option>
@@ -152,51 +152,65 @@ p.footer
         {
             minroll:1,
             maxroll:20,
-            multiplier:1,
+            dice:1,
             profitreturn: function() {
-                return (Math.floor(Math.random()*12) + 1) * this.multiplier;
+                let ret = 0;
+                for(let i = 0;i<this.dice;i++) ret += Math.floor(Math.random()*12) + 1;
+                return ret;
             }
         },{
             minroll:21,
             maxroll:30,
-            multiplier:10,
+            dice:2,
             profitreturn: function() {
-                return (Math.floor(Math.random()*12) + Math.floor(Math.random()*12) + 2) * this.multiplier;
+                let ret = 0;
+                for(let i = 0;i<this.dice;i++) ret += (Math.floor(Math.random()*12) + 1) * 10;
+                return ret;
             }
         },{
             minroll:31,
             maxroll:40,
-            multiplier:30,
+            dice:3,
             profitreturn: function() {
-                return (Math.floor(Math.random()*12) + 1) * this.multiplier;
+                let ret = 0;
+                for(let i = 0;i<this.dice;i++) ret += (Math.floor(Math.random()*12) + 1) * 10;
+                return ret;
             }
         },{
             minroll:41,
             maxroll:60,
-            multiplier:40,
+            dice:4,
             profitreturn: function() {
-                return (Math.floor(Math.random()*12) + 1) * this.multiplier;
+                let ret = 0;
+                for(let i = 0;i<this.dice;i++) ret += (Math.floor(Math.random()*12) + 1) * 10;
+                return ret;
             }
         },{
             minroll:61,
             maxroll:80,
-            multiplier:60,
+            dice:6,
             profitreturn: function() {
-                return (Math.floor(Math.random()*12) + 1) * this.multiplier;
+                let ret = 0;
+                for(let i = 0;i<this.dice;i++) ret += (Math.floor(Math.random()*12) + 1) * 10;
+                return ret;
             }
         },{
             minroll:81,
             maxroll:90,
-            multiplier:80,
+            dice:8,
             profitreturn: function() {
-                return (Math.floor(Math.random()*12) + 1) * this.multiplier;
+                let ret = 0;
+                for(let i = 0;i<this.dice;i++) ret += (Math.floor(Math.random()*12) + 1) * 10;
+                return ret;
             }
         },{
             minroll:91,
             maxroll:9999,
-            multiplier:90,
+            dice:9,
             profitreturn: function() {
-                return (Math.floor(Math.random()*12) + 1) * this.multiplier;
+                let ret = 0;
+                for(let i = 0;i<this.dice;i++) ret += (Math.floor(Math.random()*12) + 1) * 10;
+                return ret;
             }
         },
     ]
@@ -215,7 +229,9 @@ p.footer
             duration: parseInt(document.getElementById("duration").value),
             totalmodifier: 0,
             totalresult: 0,
+            netprofit: 0,
             totalprofit: 0,
+            perdiem: 6.5,
             cost: 0,
             goodscost: 40,
             findProfit: function() {
@@ -234,15 +250,20 @@ p.footer
         caravanobj.totalmodifier += caravanobj.duration;
         caravanobj.totalmodifier += 5 * caravanobj.pcs;
         caravanobj.totalmodifier += 5 * caravanobj.guards;
+        caravanobj.perdiem += 2 * caravanobj.guards;
         if(caravanobj.ryder) caravanobj.totalmodifier += 10;
-        if(caravanobj.horses) caravanobj.totalmodifier += 5;
+        if(caravanobj.horses) {
+            caravanobj.totalmodifier += 5;
+            caravanobj.perdiem += .5;
+        }
 
-        caravanobj.cost = Math.floor(caravanobj.duration/2);
+        caravanobj.cost = Math.floor(caravanobj.duration * caravanobj.perdiem);
         if(caravanobj.goods === "Staples") caravanobj.goodscost = 400;
         if(caravanobj.goods === "Luxury Goods") caravanobj.goodscost = 4000;
 
         caravanobj.totalresult = caravanobj.totalmodifier + caravanobj.roll;
-        caravanobj.totalprofit = (caravanobj.findProfit() - caravanobj.cost) - caravanobj.goodscost;
+        caravanobj.netprofit = caravanobj.findProfit();
+        caravanobj.totalprofit = caravanobj.netprofit - caravanobj.cost;
 
         return caravanobj;
     }
@@ -294,13 +315,12 @@ p.footer
             modifierstring += caravan.pcs + " non-Ryder PCs (+" + 5*caravan.pcs + "), + " + caravan.guards + " guards (+" + 5*caravan.guards + "), + ";
             if(caravan.horses) modifierstring += " extra horse (+5) + ";
             modifierstring += caravan.duration + " days duration, for a total modifier of +" + caravan.totalmodifier;
-            // document.getElementById("modifier-output").innerHTML = modifierstring;
+            document.getElementById("modifier-output").innerHTML = modifierstring;
             if(caravan.totalprofit >= 0) document.getElementById("profit-output").innerHTML = "That results in " + convertToCoin(caravan.totalprofit).bold() + " total profit";
-            else {
-                caravan.totalprofit = -caravan.totalprofit;
-                document.getElementById("profit-output").innerHTML = "That results in " + convertToCoin(caravan.totalprofit).bold().fontcolor("red") + " loss!".bold();
+            else {  
+                document.getElementById("profit-output").innerHTML = "That results in " + convertToCoin(-caravan.totalprofit).bold().fontcolor("red") + " loss!".bold();
             }
-            document.getElementById("profit-breakdown").innerHTML = "(" + convertToCoin(caravan.findProfit()) + " net, minus " + convertToCoin(caravan.cost) + " wages and " + convertToCoin(caravan.goodscost) + " goods)";
+            document.getElementById("profit-breakdown").innerHTML = "(" + convertToCoin(caravan.netprofit) + " net, minus " + convertToCoin(caravan.cost) + " wages and upkeep (" + caravan.perdiem + " sp per diem)";
             
         }
     }
